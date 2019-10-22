@@ -14,20 +14,44 @@ pub mod game {
     const SCORE_TABLE : [u32; 5] = [0, 100, 300, 600, 900];
 
     // const WHITE : [f32; 4] = [1.0 , 1.0 , 1.0 , 1.0];
-    const GRAY  : [f32; 4] = [0.3 , 0.3 , 0.3 , 1.0];
-    const TRANS : [f32; 4] = [0.0 , 0.0 , 0.0 , 0.0];
-    const CYAN  : [f32; 4] = [0.0 , 1.0 , 1.0 , 1.0];
-    const YELLOW: [f32; 4] = [1.0 , 1.0 , 0.0 , 1.0];
-    const LIME  : [f32; 4] = [0.0 , 1.0 , 0.0 , 1.0];
-    const RED   : [f32; 4] = [1.0 , 0.0 , 0.0 , 1.0];
-    const BLUE  : [f32; 4] = [0.0 , 0.0 , 1.0 , 1.0];
-    const ORANGE: [f32; 4] = [1.0 , 0.65, 0.0 , 1.0];
-    const PURPLE: [f32; 4] = [0.5 , 0.0 , 0.5 , 1.0];
+    // const GRAY  : [f32; 4] = [0.3 , 0.3 , 0.3 , 1.0];
+    // const TRANS : [f32; 4] = [0.0 , 0.0 , 0.0 , 0.0];
+    // const CYAN  : [f32; 4] = [0.0 , 1.0 , 1.0 , 1.0];
+    // const YELLOW: [f32; 4] = [1.0 , 1.0 , 0.0 , 1.0];
+    // const LIME  : [f32; 4] = [0.0 , 1.0 , 0.0 , 1.0];
+    // const RED   : [f32; 4] = [1.0 , 0.0 , 0.0 , 1.0];
+    // const BLUE  : [f32; 4] = [0.0 , 0.0 , 1.0 , 1.0];
+    // const ORANGE: [f32; 4] = [1.0 , 0.65, 0.0 , 1.0];
+    // const PURPLE: [f32; 4] = [0.5 , 0.0 , 0.5 , 1.0];
+
+    #[derive(Debug, Copy, Clone)]
+    pub enum MinoColors {
+        WHITE, GRAY, TRANS, CYAN, YELLOW, LIME, RED, BLUE, ORANGE, PURPLE,
+    }
+
+    use MinoColors::*;
+
+    impl MinoColors {
+        pub fn to_rgb(&self) -> [f32; 4] {
+            match self {
+                WHITE  => [1.0 , 1.0 , 1.0 , 1.0],
+                GRAY   => [0.3 , 0.3 , 0.3 , 1.0],
+                TRANS  => [0.0 , 0.0 , 0.0 , 0.0],
+                CYAN   => [0.0 , 1.0 , 1.0 , 1.0],
+                YELLOW => [1.0 , 1.0 , 0.0 , 1.0],
+                LIME   => [0.0 , 1.0 , 0.0 , 1.0],
+                RED    => [1.0 , 0.0 , 0.0 , 1.0],
+                BLUE   => [0.0 , 0.0 , 1.0 , 1.0],
+                ORANGE => [1.0 , 0.65, 0.0 , 1.0],
+                PURPLE => [0.5 , 0.0 , 0.5 , 1.0],
+            }
+        }
+    }
 
     struct Mino {
         shape: [[bool; 4]; 4],
         size : usize,
-        color: [f32; 4],
+        color: MinoColors,
         // kind : MinoKind,
     }
 
@@ -128,12 +152,12 @@ pub mod game {
     #[derive(Debug, Copy, Clone)]
     pub struct Block {
         filled   : bool,
-        color    : [f32; 4],
+        color    : MinoColors,
         clearing : bool,
     }
 
     impl Block {
-        fn new(filled: bool, color: [f32; 4]) -> Block {
+        fn new(filled: bool, color: MinoColors) -> Block {
             Block {
                 filled, color,
                 clearing: false,
@@ -144,7 +168,7 @@ pub mod game {
             self.filled
         }
 
-        pub fn get_color(&self) -> [f32; 4] {
+        pub fn get_color(&self) -> MinoColors {
             self.color
         }
 

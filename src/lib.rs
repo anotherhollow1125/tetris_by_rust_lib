@@ -645,7 +645,7 @@ pub mod game {
             res
         }
 
-        pub fn clock(&mut self, keys: [bool; 7]) {
+        pub fn tick(&mut self, keys: [bool; 7]) {
             if let DroppingState::Interval(f) = self.dropping {
                 self.dropping = if f > INTERVAL {
                     self.lines_close();

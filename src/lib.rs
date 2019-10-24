@@ -1,7 +1,7 @@
-extern crate rand;
+// extern crate rand;
 
 pub mod game {
-    use rand::seq::SliceRandom;
+    // use rand::seq::SliceRandom;
     use std::collections::VecDeque;
 
     const NEXTS : u32 = 3;
@@ -365,29 +365,32 @@ pub mod game {
     }
 
     struct MinoGenerator {
-        dropped: Vec<(usize, u32)>,
-        count  : u32,
-        rng    : rand::rngs::ThreadRng,
+        dropped  : Vec<(usize, u32)>,
+        count    : u32,
+        rand_gen : Box<dyn FnMut() -> u32>,
+        // rng    : rand::rngs::ThreadRng,
     }
 
     impl MinoGenerator {
-        fn new() -> MinoGenerator {
+        fn new(rand_gen: Box<dyn FnMut() -> u32>) -> MinoGenerator {
             let dropped = (0..7).map(|i| (i as usize, 0) ).collect();
 
             MinoGenerator {
                 dropped,
                 count  : 0,
-                rng    : rand::thread_rng(),
+                rand_gen,
+                // rng    : rand::thread_rng(),
             }
         }
 
         fn generate(&mut self) -> &'static Mino {
             if self.dropped.iter().all(|m| m.1 >= self.count) { self.count += 1 };
             let cands = self.dropped.iter().filter(|m| m.1 < self.count).collect::<Vec<_>>();
-            let m = match cands.choose(&mut self.rng) {
-                Some(v) => v,
-                None    => panic!("Error in Mino Generating"),
-            };
+            // let m = match cands.choose(&mut self.rng) {
+            //     Some(v) => v,
+            //     None    => panic!("Error in Mino Generating"),
+            // };
+            let m = cands[((self.rand_gen)() % (cands.len() as u32)) as usize];
             let i: usize = m.0;
             self.dropped[i].1 += 1;
             [&I, &O, &S, &Z, &J, &L, &T][i]
@@ -445,7 +448,7 @@ pub mod game {
     }
 
     impl Game {
-        pub fn new() -> Game {
+        pub fn new(rand_gen: Box<dyn FnMut() -> u32>) -> Game {
             let mut field = [[Block::new(false, TRANS); 12]; 22];
 
             for i in 0..21 {
@@ -460,7 +463,7 @@ pub mod game {
                 block.color  = TRANS;
             }
 
-            let mut minogen   = MinoGenerator::new();
+            let mut minogen   = MinoGenerator::new(rand_gen);
             let mut nextminos = VecDeque::new();
             for _ in 0..(NEXTS+1) {
                 nextminos.push_front(minogen.generate());
@@ -734,12 +737,17 @@ pub mod game {
     }
 }
 
+extern crate rand;
+
 #[cfg(test)]
 mod tests {
     #[test]
     fn new_game() {
         use super::game::Game;
-        let _ = Game::new();
+        use rand::{thread_rng, Rng};
+        let mut rng = thread_rng();
+        let rand_gen = Box::new(move || rng.gen::<u32>());
+        let _ = Game::new(rand_gen);
     }
 }
 
